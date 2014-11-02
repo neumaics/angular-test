@@ -9,29 +9,56 @@
     .factory('PhotoDataService', ['$http', function($http) {
       var cityData;
       var resolveCityData = $http.get('http://mqlocal.aol.com/photos').success(function(data){
-        cityData = data;
+        cityData = formatCityData(data);
       });
-      
+
+      function formatCityData(data) {
+        var formatted = [];
+        for (var i = 0; i < data.length; i++) {
+          formatted.push({
+            id: data[i].id,
+            description: data[i].description.replace(data[i].id, '').trim(),
+            author: data[i].author,
+            published: data[i].published,
+            slides: data[i].slides
+          });
+        }
+
+        return formatted;
+      }
+
+      function getCityDetails(id) {
+
+      }
       var service = {};
       
       service.resolveCityData = resolveCityData;
       service.getCityData = function() { return cityData; };
 
       return service;
-    }])
-    .controller('CityCtrl', ['$scope', 'PhotoDataService', 
+      }])
+    .controller('HomeCtrl', ['$scope', 'PhotoDataService', 
       function($scope, PhotoDataService) {
         $scope.cities = PhotoDataService.getCityData();
-      }]
-    )
-    .config(['$routeProvider', function($routeProvider) {
-      $routeProvider.otherwise({
-        templateUrl: 'app/home/home.html',
-        controller: 'CityCtrl',
-        resolve: {
-            'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
-        } 
+      }])
+    .controller('CityCtrl', ['$scope', '$routeParams', 'PhotoDataService',
+      function($scope, $routeParams, PhotoDataService) {
+        $scope.id = $routeParams.id;
 
+      }])
+    .config(['$routeProvider', function($routeProvider) {
+      $routeProvider
+        .when('/city/:id', {
+            templateUrl: 'app/city/city.html',
+            controller: 'CityCtrl'
+          }
+        )
+        .otherwise({
+          templateUrl: 'app/home/home.html',
+          controller: 'HomeCtrl',
+          resolve: {
+              'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
+          } 
       });
     }]);
 

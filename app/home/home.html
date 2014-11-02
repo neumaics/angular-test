@@ -1,4 +1,6 @@
 <h3>Home</h3>
 <ul>
-	<li ng-repeat="city in cities">{{city.description}}</li>
+	<li ng-repeat="city in cities">
+		<a ng-href="#/city/{{city.id}}">{{city.description}}</a>
+	</li>
 </ul>
