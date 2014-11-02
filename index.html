@@ -6,22 +6,35 @@
   <script type="text/javascript">
 
   angular.module('interview', ['ngRoute'])
-    .factory('PhotoDataService', ['$http', function($http){
-      $http.get('http://mqlocal.aol.com/photos').success(function(data){
-        console.log(data);
+    .factory('PhotoDataService', ['$http', function($http) {
+      var cityData;
+      var resolveCityData = $http.get('http://mqlocal.aol.com/photos').success(function(data){
+        cityData = data;
       });
-    }])
-    .controller('CityCtrl', ['PhotoDataService', function(PhotoDataService) {
+      
+      var service = {};
+      
+      service.resolveCityData = resolveCityData;
+      service.getCityData = function() { return cityData; };
 
+      return service;
+    }])
+    .controller('CityCtrl', ['$scope', 'PhotoDataService', 
+      function($scope, PhotoDataService) {
+        $scope.cities = PhotoDataService.getCityData();
       }]
     )
     .config(['$routeProvider', function($routeProvider) {
       $routeProvider.otherwise({
-        template: '<h3>Home</h3>',
-        controller: 'CityCtrl'
+        templateUrl: 'app/home/home.html',
+        controller: 'CityCtrl',
+        resolve: {
+            'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
+        } 
+
       });
     }]);
-    
+
   </script>
 </head>
 <body>
