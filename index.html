@@ -1,34 +1,33 @@
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.js"></script>
+  <meta charset="UTF-8"> 
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.js"></script>
+  <script type="text/javascript">
 
-<script>
+  angular.module('interview', ['ngRoute'])
+    .factory('PhotoDataService', ['$http', function($http){
+      $http.get('http://mqlocal.aol.com/photos').success(function(data){
+        console.log(data);
+      });
+    }])
+    .controller('CityCtrl', ['PhotoDataService', function(PhotoDataService) {
 
-angular.module('interview', ['ngRoute', 'ngResource'])
-.factory('SomeKindOfService', function(){
-  // might want to put a service in here
-})
-.controller('CityCtrl', function() {
-    // might want to use a controller or two
-  }
-)
-.config(function(){
-  // might want to configure some things ...
-})
-
-
-</script>
-
-
+      }]
+    )
+    .config(['$routeProvider', function($routeProvider) {
+      $routeProvider.otherwise({
+        template: '<h3>Home</h3>',
+        controller: 'CityCtrl'
+      });
+    }]);
+    
+  </script>
 </head>
-
 <body>
 
-<div ng-app="interview">
-  <!-- display cities here -->
-  
-</div>
-
+  <div ng-app="interview">
+    <div ng-view></div>    
+  </div>
 </body>
 </html>
