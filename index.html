@@ -8,32 +8,40 @@
   angular.module('interview', ['ngRoute'])
     .factory('PhotoDataService', ['$http', function($http) {
       var cityData;
+      var cityMap = {};
+
       var resolveCityData = $http.get('http://mqlocal.aol.com/photos').success(function(data){
         cityData = formatCityData(data);
       });
 
       function formatCityData(data) {
         var formatted = [];
+
         for (var i = 0; i < data.length; i++) {
-          formatted.push({
-            id: data[i].id,
-            description: data[i].description.replace(data[i].id, '').trim(),
-            author: data[i].author,
-            published: data[i].published,
-            slides: data[i].slides
-          });
+          var d = data[i];
+          d.description = data[i].description.replace(data[i].id, '').trim()
+          cityMap[d.description.toLowerCase()] = d.id;
+          formatted.push(d);
         }
 
         return formatted;
       }
 
       function getCityDetails(id) {
-
+        if(id.match(/[0-9]{9}/g) !== null) { //Numeric ID was passed
+          console.log(id);
+        } else if (cityMap[id.toLowerCase()] !== undefined){ //Some other id was passed, check it.
+          console.log(cityMap[id.toLowerCase()]);
+        } else {
+          console.log("city not identified");
+        }
       }
+
       var service = {};
       
       service.resolveCityData = resolveCityData;
       service.getCityData = function() { return cityData; };
+      service.getCityDetails = getCityDetails;
 
       return service;
       }])
@@ -44,13 +52,17 @@
     .controller('CityCtrl', ['$scope', '$routeParams', 'PhotoDataService',
       function($scope, $routeParams, PhotoDataService) {
         $scope.id = $routeParams.id;
+        PhotoDataService.getCityDetails($routeParams.id);
 
       }])
     .config(['$routeProvider', function($routeProvider) {
       $routeProvider
         .when('/city/:id', {
             templateUrl: 'app/city/city.html',
-            controller: 'CityCtrl'
+            controller: 'CityCtrl',
+            resolve: {
+              'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
+            } 
           }
         )
         .otherwise({

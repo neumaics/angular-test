@@ -1,6 +1,6 @@
 <h3>Home</h3>
 <ul>
 	<li ng-repeat="city in cities">
-		<a ng-href="#/city/{{city.id}}">{{city.description}}</a>
+		<a ng-href="#/city/{{city.description | lowercase }}">{{city.description}}</a>
 	</li>
 </ul>
