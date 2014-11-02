@@ -27,11 +27,11 @@
         return formatted;
       }
 
-      function getCityDetails(id) {
+      function getCityDetails(id, success, fail) {
         if(id.match(/[0-9]{9}/g) !== null) { //Numeric ID was passed
-          console.log(id);
+          $http.get('http://mqlocal.aol.com/photos/' + id).success(success);
         } else if (cityMap[id.toLowerCase()] !== undefined){ //Some other id was passed, check it.
-          console.log(cityMap[id.toLowerCase()]);
+          $http.get('http://mqlocal.aol.com/photos/' + cityMap[id.toLowerCase()]).success(success);
         } else {
           console.log("city not identified");
         }
@@ -52,7 +52,12 @@
     .controller('CityCtrl', ['$scope', '$routeParams', 'PhotoDataService',
       function($scope, $routeParams, PhotoDataService) {
         $scope.id = $routeParams.id;
-        PhotoDataService.getCityDetails($routeParams.id);
+        $scope.data;
+
+        PhotoDataService.getCityDetails($routeParams.id, function(data) { 
+          console.log(data);
+          $scope.data = data; 
+        });
 
       }])
     .config(['$routeProvider', function($routeProvider) {
