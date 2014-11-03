@@ -2,8 +2,9 @@ angular.module('interview', ['ngRoute'])
     .factory('PhotoDataService', ['$http', function($http) {
       var cityData;
       var cityMap = {};
+      var photoResource = 'http://mqlocal.aol.com/photos/';
 
-      var resolveCityData = $http.get('http://mqlocal.aol.com/photos').success(function(data){
+      var resolveCityData = $http.get(photoResource).success(function(data){
         cityData = formatCityData(data);
       });
 
@@ -21,11 +22,18 @@ angular.module('interview', ['ngRoute'])
       }
 
       function getCityDetails(id, success, fail) {
-        if(id.match(/[0-9]{9}/g) !== null) { //Numeric ID was passed
-          $http.get('http://mqlocal.aol.com/photos/' + id).success(success);
-        } else if (cityMap[id.toLowerCase()] !== undefined){ //Some other id was passed, check it.
-          $http.get('http://mqlocal.aol.com/photos/' + cityMap[id.toLowerCase()]).success(success);
-        } else {
+        if(id.match(/[0-9]{9}/g) !== null) {
+          //Numeric ID was passed
+          $http.get(photoResource + id)
+            .success(success)
+            .error(fail);
+        } else if (cityMap[id.toLowerCase()] !== undefined){
+          //Some other id was passed, check it.
+          $http.get(photoResource + cityMap[id.toLowerCase()])
+            .success(success)
+            .error(fail);
+        } else { 
+          // Could not identify id.
           fail();
         }
       }
@@ -37,11 +45,11 @@ angular.module('interview', ['ngRoute'])
       service.getCityDetails = getCityDetails;
 
       return service;
-      }])
+    }])
     .controller('HomeCtrl', ['$scope', 'PhotoDataService', 
       function($scope, PhotoDataService) {
         $scope.cities = PhotoDataService.getCityData();
-      }])
+    }])
     .controller('CityCtrl', ['$scope', '$routeParams', 'PhotoDataService',
       function($scope, $routeParams, PhotoDataService) {
         $scope.id = $routeParams.id;
@@ -52,7 +60,7 @@ angular.module('interview', ['ngRoute'])
           $scope.data = data; 
         });
 
-      }])
+    }])
     .config(['$routeProvider', function($routeProvider) {
       $routeProvider
         .when('/city/:id', {
