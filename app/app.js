@@ -2,7 +2,7 @@ angular.module('interview', ['ngRoute'])
     .factory('PhotoDataService', ['$http', function($http) {
       var cityData;
       var cityMap = {};
-      var photoResource = 'http://mqlocal.aol.com/photos/';
+      var photoResource = 'http://mqlocal.aol.com/photos';
 
       var resolveCityData = $http.get(photoResource).success(function(data){
         cityData = formatCityData(data);
@@ -13,7 +13,7 @@ angular.module('interview', ['ngRoute'])
 
         for (var i = 0; i < data.length; i++) {
           var d = data[i];
-          d.description = data[i].description.replace(data[i].id, '').trim()
+          d.description = data[i].description.replace(data[i].id, '').trim();
           cityMap[d.description.toLowerCase()] = d.id;
           formatted.push(d);
         }
@@ -29,7 +29,7 @@ angular.module('interview', ['ngRoute'])
             .error(fail);
         } else if (cityMap[id.toLowerCase()] !== undefined){
           //Some other id was passed, check it.
-          $http.get(photoResource + cityMap[id.toLowerCase()])
+          $http.get(photoResource + "/" + cityMap[id.toLowerCase()])
             .success(success)
             .error(fail);
         } else { 
@@ -54,10 +54,14 @@ angular.module('interview', ['ngRoute'])
       function($scope, $routeParams, PhotoDataService) {
         $scope.id = $routeParams.id;
         $scope.data;
+        $scope.description;
 
         PhotoDataService.getCityDetails($routeParams.id, function(data) { 
-          console.log(data);
-          $scope.data = data; 
+          $scope.data = data;
+          $scope.description = data.record_title.replace(data.mqid, '').trim();
+        }, function() {
+          $scope.data = [];
+          $scope.description = "Unable to find city.";
         });
 
     }])
@@ -67,7 +71,9 @@ angular.module('interview', ['ngRoute'])
             templateUrl: 'app/city/city.html',
             controller: 'CityCtrl',
             resolve: {
-              'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
+              'cityData': function(PhotoDataService) { 
+                return PhotoDataService.resolveCityData; 
+              }
             } 
           }
         )
@@ -75,7 +81,9 @@ angular.module('interview', ['ngRoute'])
           templateUrl: 'app/home/home.html',
           controller: 'HomeCtrl',
           resolve: {
-              'cityData': function(PhotoDataService) { return PhotoDataService.resolveCityData; }
+              'cityData': function(PhotoDataService) {
+                return PhotoDataService.resolveCityData;
+              }
           } 
       });
     }]);

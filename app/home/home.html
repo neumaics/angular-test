@@ -1,6 +1,7 @@
-<h3>Home</h3>
 <ul>
 	<li ng-repeat="city in cities">
-		<a ng-href="#/city/{{city.description | lowercase }}">{{city.description}}</a>
+		<span>
+			<a ng-href="#/city/{{city.description | lowercase }}" title='Published: {{city.published | date:"yyyy/MM/dd &#39;at&#39; h:mma"}}'>{{city.description}}</a> 3 photos
+		</span>
 	</li>
 </ul>

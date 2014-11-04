@@ -1,6 +1,16 @@
-<h3>{{id}}</h3>
-<div ng-repeat="photo in data.photos">
-	<a href="{{photo.url}}"><img src="{{photo.thumb}}" /></a>
-	<p>{{photo.caption}}</p>
-	<p>{{photo.credits}}</p>
+<div ng-hide="data.photos.length">
+	<h3>{{description}}</h3>
 </div>
+<div ng-show="data.photos.length">
+	<h3>{{description}}</h3>
+	<ul>
+	<li ng-repeat="photo in data.photos">
+		<ul>
+			<li><a href="{{photo.url}}"><img src="{{photo.thumb}}" /></a></li>
+			<li>{{photo.caption}}</li>
+			<li class="credit">Photo Credit: {{photo.credits}}</li>
+		</ul>
+	</li>
+	</ul>
+</div>
+<a href="#/city">View other cities</a>
